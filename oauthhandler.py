@@ -24,7 +24,7 @@ class AbstractOAuthHandler:
 			# prompting for the information. Crap. This isn't great
 			# but it's better than the current 'repeat until recursion
 			# depth exceeded' approach <wink>
-			raise HTTPError(req.get_full_url(), 401, "OAuth auth failed", headers, None)
+			return None
 		else:
 			self.retried += 1
 		if authreq:
