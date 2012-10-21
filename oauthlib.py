@@ -46,7 +46,7 @@ class TokenHelper:
 		with open(filename,"w") as out:
 			config.write(out)
 
-	def get_access_token_from_console(self, request_token_url, callback, authentication_url, access_token_url):
+	def get_access_token_from_console(self, request_token_url, authentication_url, access_token_url, callback=None):
 		"""
 		Ask the user to open an url to authenticate to provider and then copy paste the verifier code in the console
 		"""
