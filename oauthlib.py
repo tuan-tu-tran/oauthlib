@@ -1,6 +1,62 @@
+import urllib
 import urllib2
 import urlparse
 import oauth.oauth as oauth
+import ConfigParser
+
+class TokenHelper:
+	def __init__(self, consumer_key, consumer_secret, signature_method=None):
+		self.consumer=oauth.OAuthConsumer(consumer_key, consumer_secret)
+		if signature_method==None:
+			signature_method=oauth.OAuthSignatureMethod_HMAC_SHA1()
+		self.signature_method=signature_method
+		self.__opener=urllib2.build_opener()
+	
+	def get_request_token(self, request_token_url, callback_url, request_token_method="POST"):
+		http_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback=callback_url, http_url=request_token_url, http_method=request_token_method)
+		http_request.sign_request(self.signature_method, self.consumer, None)
+		return self.__get_token_from_signed_request(http_request)
+
+	def get_authentication_url(self, authentication_url, request_token):
+		url_parts=urlparse.urlparse(authentication_url)
+		params=urlparse.parse_qs(url_parts.query)
+		params["oauth_token"]=request_token.key
+		url_parts=list(url_parts)
+		url_parts[4]=urllib.urlencode(params)
+		return urlparse.urlunparse(url_parts)
+	
+	def get_access_token(self, access_token_url, verifier, request_token, access_token_method="POST"):
+		http_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, http_url=access_token_url, token=request_token, http_method=access_token_method)
+		http_request.parameters["oauth_verifier"]=verifier
+		http_request.sign_request(self.signature_method, self.consumer, request_token)
+		return self.__get_token_from_signed_request(http_request)
+
+	def get_access_token_from_file(self, filename, section="OAuth", key="access_token_key", secret="access_token_secret"):
+		config=ConfigParser.RawConfigParser()
+		config.read([filename])
+		if config.has_option(section,key) and config.has_option(section, secret):
+			return oauth.OAuthToken(config.get(section, key), config.get(section, secret))
+
+	def save_access_token_to_file(self, access_token, filename, section="OAuth", key="access_token_key", secret="access_token_secret"):
+		config=ConfigParser.RawConfigParser()
+		if not config.has_section(section):
+			config.add_section(section)
+		config.set(section, key, access_token.key)
+		config.set(section, secret, access_token.secret)
+		with open(filename,"w") as out:
+			config.write(out)
+
+	def __get_token_from_signed_request(self, http_request):
+		if http_request.http_method=="POST":
+			data={}
+		else:
+			data=None
+		resp=self.__opener.open(urllib2.Request(http_request.http_url, data, http_request.to_header()))
+		content=resp.read()
+		resp.close()
+		token=oauth.OAuthToken.from_string(content)
+		return token
+
 
 class AbstractOAuthHandler:
 	# OAuth authentication is specified in RFC 5849.
