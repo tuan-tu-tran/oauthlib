@@ -1,15 +1,8 @@
 import urllib2
+import urlparse
 
-class AbstractDigestAuthHandler:
-    # Digest authentication is specified in RFC 2617.
-
-    # XXX The client does not inspect the Authentication-Info header
-    # in a successful response.
-
-    # XXX It should be possible to test this implementation against
-    # a mock server that just generates a static set of challenges.
-
-    # XXX qop="auth-int" supports is shaky
+class AbstractOAuthHandler:
+    # OAuth authentication is specified in RFC 5849.
 
     def __init__(self, passwd=None):
         if passwd is None:
@@ -31,16 +24,17 @@ class AbstractDigestAuthHandler:
             # prompting for the information. Crap. This isn't great
             # but it's better than the current 'repeat until recursion
             # depth exceeded' approach <wink>
-            raise HTTPError(req.get_full_url(), 401, "digest auth failed",
+            raise HTTPError(req.get_full_url(), 401, "OAuth auth failed",
                             headers, None)
         else:
             self.retried += 1
         if authreq:
             scheme = authreq.split()[0]
-            if scheme.lower() == 'digest':
-                return self.retry_http_digest_auth(req, authreq)
+            if scheme.lower() == 'oauth':
+                return self.retry_http_oauth_auth(req, authreq)
 
-    def retry_http_digest_auth(self, req, auth):
+    def retry_http_oauth_auth(self, req, auth):
+	return
         token, challenge = auth.split(' ', 1)
         chal = parse_keqv_list(parse_http_list(challenge))
         auth = self.get_authorization(req, chal)
