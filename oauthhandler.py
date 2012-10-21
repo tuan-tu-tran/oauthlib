@@ -33,7 +33,19 @@ class AbstractOAuthHandler:
 				return self.retry_http_oauth_auth(req, authreq)
 
 	def retry_http_oauth_auth(self, req, auth):
-		return
+		#build the signed authorization header from consumer and access_token
+		oauth_request=oauth.OAuthRequest.from_consumer_and_token(
+			oauth_consumer=self.consumer,
+			token=self.access_token,
+			http_url=req.get_full_url(),
+			http_method=req.get_method(),
+		)
+		oauth_request.sign_request(self.signature_method, self.consumer, self.access_token)
+		auth = oauth_request.to_header()
+		if req.headers.get(self.auth_header, None) == auth:
+			return None
+		req.add_unredirected_header(self.auth_header, auth)
+		return self.parent.open(req, timeout=req.timeout)
 
 class OAuthHandler(urllib2.BaseHandler, AbstractOAuthHandler):
 	"""An authentication protocol defined by RFC 5849"""
