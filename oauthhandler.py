@@ -4,11 +4,9 @@ import urlparse
 class AbstractOAuthHandler:
     # OAuth authentication is specified in RFC 5849.
 
-    def __init__(self, passwd=None):
-        if passwd is None:
-            passwd = HTTPPasswordMgr()
-        self.passwd = passwd
-        self.add_password = self.passwd.add_password
+    def __init__(self, consumer, access_token):
+	self.consumer=consumer
+	self.access_token=access_token
         self.retried = 0
         self.nonce_count = 0
         self.last_nonce = None
