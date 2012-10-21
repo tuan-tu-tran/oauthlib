@@ -46,6 +46,24 @@ class TokenHelper:
 		with open(filename,"w") as out:
 			config.write(out)
 
+	def get_access_token_from_console(self, request_token_url, callback, authentication_url, access_token_url):
+		"""
+		Ask the user to open an url to authenticate to provider and then copy paste the verifier code in the console
+		"""
+		request_token=self.get_request_token(request_token_url, callback)
+
+		url = self.get_authentication_url(authentication_url, request_token)
+
+		print "Go to:"
+		print
+		print url
+		print
+		print "login and then copy/paste the code here"
+		verifier=raw_input()
+
+		access_token=self.get_access_token(access_token_url, verifier, request_token)
+		return access_token
+
 	def __get_token_from_signed_request(self, http_request):
 		if http_request.http_method=="POST":
 			data={}
