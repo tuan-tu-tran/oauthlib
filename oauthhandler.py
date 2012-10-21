@@ -1,12 +1,16 @@
 import urllib2
 import urlparse
+import oauth.oauth as oauth
 
 class AbstractOAuthHandler:
 	# OAuth authentication is specified in RFC 5849.
 
-	def __init__(self, consumer, access_token):
+	def __init__(self, consumer, access_token, signature_method=None):
 		self.consumer=consumer
 		self.access_token=access_token
+		if signature_method==None:
+			signature_method=oauth.OAuthSignatureMethod_HMAC_SHA1()
+		self.signature_method=signature_method
 		self.retried = 0
 
 	def reset_retry_count(self):
