@@ -41,7 +41,7 @@ class AbstractOAuthHandler:
 			http_method=req.get_method(),
 		)
 		oauth_request.sign_request(self.signature_method, self.consumer, self.access_token)
-		auth = oauth_request.to_header()
+		auth = oauth_request.to_header()[self.auth_header]
 		if req.headers.get(self.auth_header, None) == auth:
 			return None
 		req.add_unredirected_header(self.auth_header, auth)
