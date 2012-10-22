@@ -114,6 +114,17 @@ class AbstractOAuthHandler:
 			http_url=req.get_full_url(),
 			http_method=req.get_method(),
 		)
+
+		#add parameters from post data
+		if req.has_data():
+			data=dict(urlparse.parse_qsl(req.data))
+			oauth_request.parameters.update(data)
+
+		#add parameters from query string
+		query_string=urlparse.urlparse(req.get_full_url()).query
+		data=dict(urlparse.parse_qsl(query_string))
+		oauth_request.parameters.update(data)
+
 		oauth_request.sign_request(self.signature_method, self.consumer, self.access_token)
 		auth = oauth_request.to_header()[self.auth_header]
 		if req.headers.get(self.auth_header, None) == auth:
