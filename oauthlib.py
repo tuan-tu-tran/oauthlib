@@ -19,7 +19,7 @@ class TokenHelper:
 
 	def get_authentication_url(self, authentication_url, request_token):
 		url_parts=urlparse.urlparse(authentication_url)
-		params=urlparse.parse_qs(url_parts.query)
+		params=dict(urlparse.parse_qsl(url_parts.query))
 		params["oauth_token"]=request_token.key
 		url_parts=list(url_parts)
 		url_parts[4]=urllib.urlencode(params)
