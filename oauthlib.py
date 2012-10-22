@@ -125,11 +125,16 @@ class AbstractOAuthHandler:
 		data=dict(urlparse.parse_qsl(query_string))
 		oauth_request.parameters.update(data)
 
+		#sign request
 		oauth_request.sign_request(self.signature_method, self.consumer, self.access_token)
+
+		#add authorization header
 		auth = oauth_request.to_header()[self.auth_header]
 		if req.headers.get(self.auth_header, None) == auth:
 			return None
 		req.add_unredirected_header(self.auth_header, auth)
+
+		#open request
 		return self.parent.open(req, timeout=req.timeout)
 
 class OAuthHandler(urllib2.BaseHandler, AbstractOAuthHandler):
