@@ -31,13 +31,15 @@ class TokenHelper:
 		http_request.sign_request(self.signature_method, self.consumer, request_token)
 		return self.__get_token_from_signed_request(http_request)
 
-	def get_access_token_from_file(self, filename, section="OAuth", key="access_token_key", secret="access_token_secret"):
+	@staticmethod
+	def get_access_token_from_file(filename, section="OAuth", key="access_token_key", secret="access_token_secret"):
 		config=ConfigParser.RawConfigParser()
 		config.read([filename])
 		if config.has_option(section,key) and config.has_option(section, secret):
 			return oauth.OAuthToken(config.get(section, key), config.get(section, secret))
 
-	def save_access_token_to_file(self, access_token, filename, section="OAuth", key="access_token_key", secret="access_token_secret"):
+	@staticmethod
+	def save_access_token_to_file(access_token, filename, section="OAuth", key="access_token_key", secret="access_token_secret"):
 		config=ConfigParser.RawConfigParser()
 		if not config.has_section(section):
 			config.add_section(section)
