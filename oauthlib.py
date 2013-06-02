@@ -12,9 +12,9 @@ class TokenHelper:
 		self.signature_method=signature_method
 		self.__opener=urllib2.build_opener()
 	
-	def get_request_token(self, request_token_url, callback_url, request_token_method="POST"):
+	def get_request_token(self, request_token_url, callback_url=None, request_token_method="POST"):
 		http_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback=callback_url, http_url=request_token_url, http_method=request_token_method)
-		http_request.sign_request(self.signature_method, self.consumer, None)
+		http_request.sign_request(self.signature_method, self.consumer, "")
 		return self.__get_token_from_signed_request(http_request)
 
 	def get_authentication_url(self, authentication_url, request_token):
@@ -81,7 +81,7 @@ class TokenHelper:
 class AbstractOAuthHandler:
 	# OAuth authentication is specified in RFC 5849.
 
-	def __init__(self, consumer, access_token, signature_method=None):
+	def __init__(self, consumer=None, access_token=None, signature_method=None):
 		self.consumer=consumer
 		self.access_token=access_token
 		if signature_method==None:
