@@ -1,6 +1,6 @@
 OAuthHandler
 
-An subclass of urllib2.BaseHandler that (partially) handles OAuth authentication.
+A subclass of urllib2.BaseHandler that (partially) handles OAuth authentication.
 
 OAuth authentication is defined in RFC 5849.
 It involves a resource consumer, a resource provider and a resource owner.
@@ -13,4 +13,4 @@ it controlled access to the resources.
 This class only handles the second part of the authentication process i.e. use the
 access token to access controlled resources.
 
-It CANNOT obtain the access token by itself.
+The current implementation is not able to obtain the access token by itself.
