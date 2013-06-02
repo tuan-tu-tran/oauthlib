@@ -3,6 +3,8 @@ import urllib2
 import urlparse
 import oauth.oauth as oauth
 import ConfigParser
+import logging as logger
+logger=logger.getLogger("oauthlib")
 
 class TokenHelper:
 	def __init__(self, consumer_key, consumer_secret, signature_method=None):
@@ -14,6 +16,7 @@ class TokenHelper:
 		self.__request_token=None
 	
 	def get_request_token(self, request_token_url, callback_url=None, request_token_method="POST"):
+		logger.debug("get request token from url %s", request_token_url)
 		http_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback=callback_url, http_url=request_token_url, http_method=request_token_method)
 		http_request.sign_request(self.signature_method, self.consumer, "")
 		return self.__get_token_from_signed_request(http_request)
