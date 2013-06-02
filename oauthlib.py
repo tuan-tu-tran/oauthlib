@@ -84,7 +84,7 @@ class TokenHelper:
 		return token
 
 
-class AbstractOAuthHandler:
+class AbstractOAuthHandler(urllib2.BaseHandler):
 	# OAuth authentication is specified in RFC 5849.
 
 	def __init__(self, consumer=None, access_token=None, signature_method=None):
@@ -149,7 +149,7 @@ class AbstractOAuthHandler:
 		#open request
 		return self.parent.open(req, timeout=req.timeout)
 
-class OAuthHandler(urllib2.BaseHandler, AbstractOAuthHandler):
+class OAuthHandler(AbstractOAuthHandler):
 	"""An authentication protocol defined by RFC 5849"""
 
 	auth_header = 'Authorization'
