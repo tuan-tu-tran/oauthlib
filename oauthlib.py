@@ -82,15 +82,17 @@ class AbstractOAuthHandler:
 	# OAuth authentication is specified in RFC 5849.
 
 	def __init__(self, consumer=None, access_token=None, signature_method=None):
-		self.consumer=consumer
-		self.access_token=access_token
+		self.setup(consumer, access_token)
 		if signature_method==None:
 			signature_method=oauth.OAuthSignatureMethod_HMAC_SHA1()
 		self.signature_method=signature_method
 		self.retried = 0
-
 	def reset_retry_count(self):
 		self.retried = 0
+
+	def setup(self, consumer, access_token):
+		self.consumer=consumer
+		self.access_token=access_token
 
 	def http_error_auth_reqed(self, auth_header, host, req, headers):
 		authreq = headers.get(auth_header, None)
@@ -108,7 +110,7 @@ class AbstractOAuthHandler:
 			if scheme.lower() == 'oauth':
 				return self.retry_http_oauth_auth(req, authreq)
 
-	def retry_http_oauth_auth(self, req, auth):
+	def prepare_request(self, req):
 		#build the signed authorization header from consumer and access_token
 		oauth_request=oauth.OAuthRequest.from_consumer_and_token(
 			oauth_consumer=self.consumer,
@@ -136,6 +138,8 @@ class AbstractOAuthHandler:
 			return None
 		req.add_unredirected_header(self.auth_header, auth)
 
+	def retry_http_oauth_auth(self, req, auth=None):
+		self.prepare_request(req)
 		#open request
 		return self.parent.open(req, timeout=req.timeout)
 
