@@ -11,11 +11,17 @@ class TokenHelper:
 			signature_method=oauth.OAuthSignatureMethod_HMAC_SHA1()
 		self.signature_method=signature_method
 		self.__opener=urllib2.build_opener()
+		self.__request_token=None
 	
 	def get_request_token(self, request_token_url, callback_url=None, request_token_method="POST"):
 		http_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback=callback_url, http_url=request_token_url, http_method=request_token_method)
 		http_request.sign_request(self.signature_method, self.consumer, "")
 		return self.__get_token_from_signed_request(http_request)
+
+	def get_request_token_and_authentication_url(self, authentication_url, request_token_url):
+		request_token=self.get_request_token(request_token_url)
+		authentication_url=self.get_authentication_url(authentication_url, request_token)
+		return request_token, authentication_url
 
 	def get_authentication_url(self, authentication_url, request_token):
 		url_parts=urlparse.urlparse(authentication_url)
